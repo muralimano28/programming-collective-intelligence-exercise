@@ -64,3 +64,39 @@ def similarity_score(preferences, person_1, person_2):
         sum_of_squares = sum_of_squares + square_value
 
     return 1/(1 + sqrt(sum_of_squares))
+
+
+def recommendMovies(preferences, person):
+    simTotals = {}
+    weightedScore = {}
+    recommendedMovies = []
+
+    for eachPerson in preferences:
+        if eachPerson != person:
+            simScore = similarity_score(preferences, person, eachPerson)
+
+            if simScore <= 0:
+                continue
+
+            for movie in preferences[eachPerson]:
+                if movie not in preferences[person] or preferences[person][movie] == 0:
+                    simTotals.setdefault(movie, 0)
+                    simTotals[movie] = simTotals[movie] + simScore
+                    weightedScore.setdefault(movie, 0)
+                    weightedScore[movie] = weightedScore[movie] + \
+                        (simScore * preferences[eachPerson][movie])
+
+    # print(simTotals)
+    # print(weightedScore)
+
+    for movie in weightedScore:
+        recommendedMovies.append(
+            (movie, weightedScore[movie]/simTotals[movie]))
+
+    recommendedMovies.sort()
+    recommendedMovies.reverse()
+
+    return recommendedMovies
+
+
+print(recommendMovies(critics, 'Toby'))
